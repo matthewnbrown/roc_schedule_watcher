@@ -4,7 +4,6 @@ from option import Option
 
 @dataclass
 class OfflineStatsPage:
-    userid: int
     username: str
     rank: int
     alliance_id: Option[int]
@@ -13,4 +12,4 @@ class OfflineStatsPage:
     commander_id: Option[int]
     commandchain_top_id: Option[int]
     officers: list[int]
-    user_last_online: datetime
+    is_online: bool
