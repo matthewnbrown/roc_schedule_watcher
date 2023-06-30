@@ -1,27 +1,27 @@
 
-from src.pageparser.offlinestatpageparser import OfflineStatPageParser
+from src.offlinestatpageparser import OfflineStatPageParser
 
 from option import Result
 import unittest
 
 class OfflinePageParserTest(unittest.TestCase):
     def _load_offline_commandchain_officers(self) -> str:
-        with open("./tests/pageparser/testpages/offlineofficers.html", "r") as file:
+        with open("./tests/testpages/offlineofficers.html", "r") as file:
             data = file.read()
         return data
     
     def _load_online_commandchain_noofficers(self) -> str:
-        with open("./tests/pageparser/testpages/online.html", "r") as file:
+        with open("./tests/testpages/online.html", "r") as file:
             data = file.read()
         return data
 
     def _load_no_command_chain(self) -> str:
-        with open("./tests/pageparser/testpages/no_command_chain.html", "r") as file:
+        with open("./tests/testpages/no_command_chain.html", "r") as file:
             data = file.read()
         return data
     
     def _load_no_alliance(self) -> str:
-        with open("./tests/pageparser/testpages/no_alliance.html", "r") as file:
+        with open("./tests/testpages/no_alliance.html", "r") as file:
             data = file.read()
         return data
     
