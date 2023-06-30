@@ -2,6 +2,7 @@ from src.watchlistvalidator import WatchlistValidator
 from src.offlinestatpageparser import OfflineStatPageParser
 from src.watcher import Watcher
 from src.playerlogsaver import PlayerLogSaver
+from src.urlgenerator import ROCDecryptUrlGenerator
 
 import asyncio
 import asyncclick as click
@@ -53,8 +54,9 @@ async def cli(config: Config, verbose: bool, watchidfile: click.File, outdir: cl
         
     pageparser = OfflineStatPageParser('lxml')
     playerlogsaver = PlayerLogSaver(config.logger, outdir)
+    urlgen = ROCDecryptUrlGenerator()
     
-    watcher = Watcher(config.logger, pageparser, playerlogsaver)
+    watcher = Watcher(config.logger, pageparser, playerlogsaver, urlgen)
     await watcher.watch(ids, 30, 0)
 
 
