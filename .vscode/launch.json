@@ -13,11 +13,17 @@
       "justMyCode": true
     },
     {
-      "name": "Python: Run Single UserId Param",
+      "name": "Python: Run UserId Param",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/run.py",
-      "args": ["-v", "-l", "30228,14,29636,21270,1,22995"]
+      "args": ["-l", "30228,14,29636,21270,1,22995"]
+    },
+    {
+      "name": "Python: Run read ids from file",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/run.py",
     }
   ]
 }
