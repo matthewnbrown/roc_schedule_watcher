@@ -10,30 +10,31 @@ class OfflineStatPageParser:
     def parse_offlinestat_page(self, html: str) -> Result[OfflineStatsPage, str]:
         soup = BeautifulSoup(html, self._parser)
         content = soup.find('div', {'id': 'content'})
-        
+
         if content is None or soup.title is None:
             return Result.Err("Error parsing html")
-        
+
         if "Stats for" not in soup.title.text:
             return Result.Err(f"Page has unexpected title {soup.title.text}")
-        
+
         return OfflineStatPageParser._extract_pagemodel_from_content(content)
-    
+
     [staticmethod]
-    def _extract_pagemodel_from_content(contentsoup: BeautifulSoup) -> Result[OfflineStatsPage, str]:
+    def _extract_pagemodel_from_content(
+            contentsoup: BeautifulSoup) -> Result[OfflineStatsPage, str]:
         playercard_name = contentsoup.find('div', {"class": "playercard_name"})
         user_name = playercard_name.text[1:-1]
         is_online = "oindicator" in playercard_name.get("class")
-        
+
         playerstats = OfflineStatPageParser._extract_playerstats(contentsoup)
         commandchain = OfflineStatPageParser._extract_playercommandchain(contentsoup)
-        
+
         if playerstats.is_err:
             return Result.Err(playerstats.Err())
 
         if commandchain.is_err:
             return Result.Err(commandchain.Err())
-        
+
         rank, alliance, tff, tff_type = playerstats.unwrap()
         commanderchain_top_id, commander_id, officers = commandchain.unwrap()
 

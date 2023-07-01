@@ -21,7 +21,7 @@ class PlayerLogSaver:
             page: OfflineStatsPage) -> None:
         filepath = os.path.join(self._savepathbase, f'{userId}.csv')
         if not os.path.exists(filepath):
-            self._logger.debug('Creating logfile for userid %s', userId)
+            self._logger.info('Creating logfile for userid %s', userId)
 
         formatted_csv_input = self._get_formatted_csv_input(
             timestamp, page, self._formatoptions)

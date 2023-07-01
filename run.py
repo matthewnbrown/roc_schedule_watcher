@@ -8,7 +8,9 @@ import asyncio
 import asyncclick as click
 import logging
 
-VALID_FORMAT_OPTIONS = [ 'timestamp', 'online', 'username', 'rank', 'allianceid', 'tff', 'tfftype', 'commanderid', 'topofchainid', 'officers' ]
+VALID_FORMAT_OPTIONS = ['timestamp', 'online', 'username', 'rank',
+                        'allianceid', 'tff', 'tfftype', 'commanderid',
+                        'topofchainid', 'officers']
 
 
 class Config(object):

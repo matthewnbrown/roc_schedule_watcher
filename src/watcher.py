@@ -2,11 +2,12 @@ from src.offlinestatpageparser import OfflineStatPageParser, OfflineStatsPage
 from src.playerlogsaver import PlayerLogSaver
 from src.urlgenerator import ROCUrlGenerator
 
-from datetime import datetime
-from logging import Logger
-from option import Result
 import asyncio
 import aiohttp
+from datetime import datetime
+import humanfriendly as hf
+from logging import Logger
+from option import Result
 
 
 class Watcher:
@@ -20,22 +21,28 @@ class Watcher:
         self._pageparser = pageparse
         self._logssaver = logsaver
         self._urlgenerator = url_generator
+        self._lastonlinemap = {}
 
     async def watch(self, watchidlist: list[int],
                     delaytime_s: float,
                     iterations: int = 0):
         iter_count = 0
+
         while iterations <= 0 or iter_count < iterations:
             async with aiohttp.ClientSession() as session:
                 self._logger.debug('Starting log iteration %i', iter_count)
-                await asyncio.gather(*(self._perform_user_log(session, id) for id in watchidlist))
+                await asyncio.gather(*(self._perform_user_log(
+                    session, id) for id in watchidlist))
             self._logger.debug('Finished log iteration')
 
             iter_count += 1
-            self._logger.info('Sleeping for %s seconds', delaytime_s)
+            self._logger.info('Sleeping for %s seconds'
+                              + '\n-----------------------', delaytime_s)
             await asyncio.sleep(delaytime_s)
 
-    async def _perform_user_log(self, session: aiohttp.ClientSession, userId: str) -> None:
+    async def _perform_user_log(self,
+                                session: aiohttp.ClientSession,
+                                userId: str) -> None:
         self._logger.debug('Starting user log for id %s', userId)
         try:
             await self.get_user_page(session, userId)
@@ -69,9 +76,28 @@ class Watcher:
                 return pageresult
             page = pageresult.unwrap()
             self._logssaver.save_log(id, timestamp, page)
-            self._log_user(page)
+            self._log_user(id, page, timestamp)
             return pageresult
 
-    def _log_user(self, page: OfflineStatsPage) -> None:
-        oneline = 'online' if page.is_online else 'offline'
-        self._logger.info('%s: %s', page.username, oneline)
+    def _log_user(self,
+                  userid: int,
+                  page: OfflineStatsPage,
+                  timestamp: datetime) -> None:
+        if page.is_online:
+            self._lastonlinemap[userid] = timestamp
+
+        if page.is_online:
+            onlinestatus = 'online'
+        else:
+            onlinestatus = self._get_useronlinestatus_str(userid, timestamp)
+        self._logger.info('%s: %s', page.username, onlinestatus)
+
+    def _get_useronlinestatus_str(
+            self, userid: int, timestamp: datetime) -> str:
+        if userid in self._lastonlinemap:
+            laston = self._lastonlinemap[userid]
+            time_since_online = hf.format_timespan(timestamp - laston) + ' ago'
+        else:
+            time_since_online = 'unknown'
+
+        return f'last online: {time_since_online}'
