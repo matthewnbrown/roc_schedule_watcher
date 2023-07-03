@@ -3,6 +3,7 @@ from src.model.offlinestatspage import OfflineStatsPage
 from bs4 import BeautifulSoup
 from option import Result, Option
 
+
 class OfflineStatPageParser:
     def __init__(self, parser: str = 'lxml') -> None:
         self._parser = parser
@@ -41,28 +42,32 @@ class OfflineStatPageParser:
         return Result.Ok(
             OfflineStatsPage(
                 user_name, rank, alliance, tff, tff_type, commander_id, commanderchain_top_id, officers, is_online))
-    
+
     [staticmethod]
-    def _extract_playerstats(contentsoup: BeautifulSoup) -> Result[tuple[int, Option[int], str, str], str]:
+    def _extract_playerstats(
+            contentsoup: BeautifulSoup
+            ) -> Result[tuple[int, Option[int], str, str], str]:
         statssoup = contentsoup.find('div', {"class": "playercard_stats"})
         rank = int(statssoup.find("div", {"class": "playercard_rank"}).text.strip()[1:])
         tff, tff_type = statssoup.find("div", {"class": "playercard_size"}).text.strip().split(' ')
         tff = int(tff.replace(',', ''))
-        
+
         alliancesoup = statssoup.find("div", {"class": "playercard_alliance"})
         alliancelinksoup = alliancesoup.find("a")
-        
+
         if alliancelinksoup is None:
             alliance = Option.NONE()
         else:
             alliancelink = alliancelinksoup.get("href")
             allianceid = int(alliancelink.split("?a=")[1])
             alliance = Option.Some(allianceid)
-        
+
         return Result.Ok((rank, alliance, tff, tff_type))
-        
+
     [staticmethod]
-    def _extract_playercommandchain(contentsoup: BeautifulSoup) -> Result[tuple[Option[int], Option[int], list[int]], str]:
+    def _extract_playercommandchain(
+            contentsoup: BeautifulSoup
+            ) -> Result[tuple[Option[int], Option[int], list[int]], str]:
         commandsoup = contentsoup.find("div", {"class": "playercard_commandchain"})
         top = commandsoup.find("div", {"class": "playercard_topofchain"})
         if top is None:

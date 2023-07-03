@@ -8,10 +8,6 @@ import asyncio
 import asyncclick as click
 import logging
 
-VALID_FORMAT_OPTIONS = ['timestamp', 'online', 'username', 'rank',
-                        'allianceid', 'tff', 'tfftype', 'commanderid',
-                        'topofchainid', 'officers']
-
 
 class Config(object):
     def __init__(self) -> None:
@@ -30,9 +26,11 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
               type=click.Path(writable=True, file_okay=False, exists=True),
               help='directory to place logs in.', show_default=True)
 @click.option('-l', '--watchidlist', default='', type=str,
-              help='overrides watchlist file. comma seperated list of ids i.e., 3102,231,33')
+              help='overrides watchlist file.'
+              + ' comma seperated list of ids i.e., 3102,231,33')
 @click.option('-f', '--printformat',
-              default='timestamp,online,username,rank,allianceid,tff,tfftype,commanderid,topofchainid,officers',
+              default='timestamp,online,username,rank,allianceid,'
+              + 'tff,tfftype,commanderid,topofchainid,officers',
               type=str, show_default=True,
               help='comma seperated list order to print details')
 @click.option('-d', '--delay-time', type=click.FloatRange(0, None),
@@ -65,7 +63,7 @@ async def cli(config: Config, verbose: bool, watchidfile: click.File,
     config.logger.debug('watchlist ids: %s', ids)
     formatoptions = printformat.lower().split(',')
 
-    if any(x not in VALID_FORMAT_OPTIONS for x in formatoptions):
+    if any(x not in PlayerLogSaver.FORMAT_OPTIONS for x in formatoptions):
         config.logger.error('Invalid logger format options')
         return
 

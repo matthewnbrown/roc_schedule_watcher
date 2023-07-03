@@ -8,6 +8,25 @@ import os
 
 
 class PlayerLogSaver:
+    FORMAT_OPTIONS = ['timestamp', 'online', 'username', 'rank',
+                      'allianceid', 'tff', 'tfftype', 'commanderid',
+                      'topofchainid', 'officers']
+
+    FORMAT_TO_ENCODEDVALUE_MAP = defaultdict(lambda: 'xx', {
+        'timestamp': 'ts',
+        'online': 'os',
+        'username': 'un',
+        'rank': 'rk',
+        'allianceid': 'ai',
+        'tff': 'tf',
+        'tfftype': 'tt',
+        'commanderid': 'ci',
+        'topofchainid': 'tc',
+        'officers': 'of'
+    })
+
+    VERSION_NUMBER = 'V2'
+
     def __init__(self, logger: Logger,
                  save_path_base: str,
                  formatoptions: list[str]) -> None:
@@ -19,7 +38,8 @@ class PlayerLogSaver:
             self, userId: str,
             timestamp: datetime,
             page: OfflineStatsPage) -> None:
-        filepath = os.path.join(self._savepathbase, f'{userId}.csv')
+        filepath = os.path.join(
+            self._savepathbase, f'{userId}-{self.VERSION_NUMBER}.csv')
         if not os.path.exists(filepath):
             self._logger.info('Creating logfile for userid %s', userId)
 
@@ -56,5 +76,6 @@ class PlayerLogSaver:
                 'topofchainid': commandertopid,
                 'officers': page.officers
         })
-
-        return [value_map[x] for x in format]
+        form = [PlayerLogSaver.FORMAT_TO_ENCODEDVALUE_MAP[x] for x in format]
+        formatinfo = ''.join(form)
+        return [formatinfo] + [value_map[x] for x in format]
